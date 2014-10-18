@@ -1,5 +1,12 @@
+desc "run test"
+task :default => :test
+desc "run test"
+task :test do
+  sh "ruby test/test.rb"
+end
+
 desc "run the http server"
-task :default do
+task :init do
   sh "ruby app.rb"
 end
 
