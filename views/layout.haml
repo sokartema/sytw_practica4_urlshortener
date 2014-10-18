@@ -1,0 +1,15 @@
+!!!
+%html
+    %head
+        %title Inicio
+        %link{:href => "/css/lavish-bootstrap.css" , :rel => "stylesheet" , :media => "screen" , :type => "text/css"}
+    %body
+        %nav.navbar.navbar-inverse{:role => "navegation"}
+            .navbar-header
+                %img.pull-left{:src => "logo/logo.png" ,:alt => "Logo" ,:width => "50px" , :height => "50px"}
+                %a.navbar-brand{:href => "/"} Practica URL Shortener
+        .container
+            =yield
+        .navbar.navbar-inverse.navbar-fixed-bottom
+            %a.navbar-brand{:href=>"http://www.ull.es/view/centros/etsii/Inicio/es"} ETSII ULL
+            %a.navbar-brand.pull-right{:href => "https://github.com/alu0100595727"} alu0100595727 Jazer Abreu
