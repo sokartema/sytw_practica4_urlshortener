@@ -11,6 +11,7 @@ gem "rake"
 gem "minitest"
 gem "test-unit"
 gem "rack-test"
+gem "sinatra-flash"
 
 
 group :development do
