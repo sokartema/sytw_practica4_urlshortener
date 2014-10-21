@@ -1,8 +1,6 @@
 .row
     .col-md-5.container
-    -if (@user == nil)
-        %h1 Bienvenido Anónimo
-    -else
+
         %h1 Bienvenido #{@user}
 
 .row
@@ -36,5 +34,6 @@
                         %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.opcional})
         %form{:name=> "input" , :action=>"/",:method=>"get"}
             %button.btn.btn-info{:type =>"submit"} Sign In With Twitter
-
+        %form{:name=> "input" , :action=>"/user/google/logout",:method=>"get"}
+            %button.btn.btn-warning{:type =>"submit"} Logout
     .col-md-1

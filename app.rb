@@ -9,11 +9,15 @@ require 'pp'
 require 'data_mapper'
 require 'omniauth-oauth2'
 require 'omniauth-google-oauth2'
-require 'sinatra/flash'
 
 use OmniAuth::Builder do
   config = YAML.load_file 'config/config.yml'
-  provider :google_oauth2, config['gidentifier'], config['gsecret']
+  provider :google_oauth2, config['gidentifier'], config['gsecret'],
+  {
+     :authorize_params => {
+        :force_login => 'true'
+      }
+    }
 end
 
 DataMapper.setup( :default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/my_shortened_urls.db" )
@@ -70,8 +74,8 @@ get '/auth/:name/callback' do
   case params[:name]
   when 'google_oauth2'
   @auth = request.env['omniauth.auth']
-  flash[:name] = @auth['info'].name
-  flash[:email] = @auth['info'].email
+  session[:name] = @auth['info'].name
+  session[:email] = @auth['info'].email
   redirect "/user/google"
   else
   redirect "/"
@@ -81,26 +85,32 @@ end
 
 get '/user/:webname' do
 
+  if (session[:name] != nil)
+
   case(params[:webname])
   when "google"
-  name = flash[:name]
-  email = flash[:email]
-  @user = name
+  @user = session[:name]
+  email = session[:email]
   @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil, :limit => 20)
-  @list2 = ShortenedUrl.all(:order => [:id.asc], :email => email, :limit => 20)
-  flash[:email] = email
+  @list2 = ShortenedUrl.all(:order => [:id.asc], :email => email , :email.not => nil, :limit => 20)
   haml :google
   else
   haml :index
   end
 
+  else
+
+  redirect '/'
+  end
+
+
 end
 
 post  '/user/:webname' do
 
-puts "inside post '/': #{params}"
+  if (session[:name] != nil)
+
   uri = URI::parse(params[:url])
-  opcional = params[:opcional]
   if uri.is_a? URI::HTTP or uri.is_a? URI::HTTPS then
     begin
       @short_url = ShortenedUrl.first_or_create(:url => params[:url] , :email => flash[:email] , :opcional => params[:opcional])
@@ -113,6 +123,19 @@ puts "inside post '/': #{params}"
     logger.info "Error! <#{params[:url]}> is not a valid URL"
   end
   redirect '/user/google'
+
+  else
+
+  redirect '/'
+  end
+end
+
+get '/user/:webname/logout' do
+
+  session.clear
+
+  redirect '/'
+
 end
 
 error do haml :index end
