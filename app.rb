@@ -10,6 +10,7 @@ require 'omniauth-twitter'
 require 'data_mapper'
 require 'omniauth-oauth2'
 require 'omniauth-google-oauth2'
+require 'omniauth-facebook'
 
 use OmniAuth::Builder do
   config = YAML.load_file 'config/config.yml'
@@ -25,6 +26,9 @@ use OmniAuth::Builder do
         :force_login => 'true'
       }
     }
+  provider :facebook, config['fidentifier'], config['fsecret'],
+    :scope => 'email, public_profile'
+
 end
 
 
@@ -46,6 +50,7 @@ set :session_secret, '*&(^#234a)'
 
 get '/' do
   @user = nil
+  @webname = nil
   puts "inside get '/': #{params}"
   @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil , :nickname => nil ,:limit => 20)
   # in SQL => SELECT * FROM "ShortenedUrl" ORDER BY "id" ASC
@@ -90,6 +95,11 @@ get '/auth/:name/callback' do
 	  session[:name] = @auth['info'].name
 	  session[:nickname] = @auth['info'].nickname
       redirect "/user/twitter"
+  when 'facebook'
+    @auth = request.env['omniauth.auth']
+    session[:name] = @auth['info'].name
+    session[:email] = @auth['info'].email
+    redirect "/user/facebook"
   else
   redirect "/"
   end
@@ -99,6 +109,8 @@ end
 get '/user/:webname' do
 
   if (session[:name] != nil)
+
+  @webname = params[:webname]
 
   case(params[:webname])
   when "google"
@@ -115,6 +127,14 @@ get '/user/:webname' do
 	  	@list2 = ShortenedUrl.all(:order => [:id.asc], :nickname => nickname , :email=>nil, :nickname.not => nil, :limit => 20)
 
 		haml :twitter
+  when "facebook"
+
+    @user = session[:name]
+    email = session[:email]
+    @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil, :limit => 20)
+    @list2 = ShortenedUrl.all(:order => [:id.asc], :email => email , :email.not => nil, :limit => 20)
+    haml :facebook
+
   else
   	haml :index
   end
@@ -156,6 +176,18 @@ post  '/user/:webname' do
     end
 
     redirect '/user/twitter'
+
+  when "facebook"
+
+      begin
+        @short_url = ShortenedUrl.first_or_create(:url => params[:url] , :email => session[:email] , :opcional => params[:opcional])
+      rescue Exception => e
+        puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
+        pp @short_url
+        puts e.message
+      end
+
+    redirect '/user/facebook'
 
   else
 

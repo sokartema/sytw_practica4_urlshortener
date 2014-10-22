@@ -7,11 +7,16 @@
         %nav.navbar.navbar-inverse{:role => "navegation"}
             .navbar-header
                 %img.pull-left{:src => "http://i1377.photobucket.com/albums/ah55/Jazer_Abreu/logo_zps1d404711.png" ,:alt => "Logo" ,:width => "50px" , :height => "50px"}
-                -if (@user == nil)
+                -case (@webname)
+                -when nil
                     %a.navbar-brand{:href => "/"} Practica URL Shortener
-                -else
+                -when "google"
                     %a.navbar-brand{:href => "/user/google"} Practica URL Shortener
-                    
+                -when "twitter"
+                    %a.navbar-brand{:href => "/user/twitter"} Practica URL Shortener
+                -when "facebook"
+                    %a.navbar-brand{:href => "/user/facebook"} Practica URL Shortener
+
 
         .container
             =yield

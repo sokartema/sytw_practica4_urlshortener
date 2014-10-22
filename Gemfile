@@ -8,6 +8,7 @@ gem 'haml'
 gem 'omniauth-twitter'
 gem 'omniauth'
 gem 'omniauth-google-oauth2'
+gem 'omniauth-facebook'
 gem "rake"
 gem "minitest"
 gem "test-unit"
