@@ -1,0 +1,39 @@
+.row
+    .col-md-5.container
+
+        %h1 Bienvenido #{@user}
+
+.row
+    .col-md-4.container.jumbotron
+        %h2 Acorta tu URL!!
+        %form{:name => "input" , :action=>"/user/twitter" , :method=>"post"}
+            %label{:for=>"url"} URL:
+            %input.form-control#url{:type=>"text", :name=>"url" ,:placeholder=>"http://ejemplo.com"}
+            %label{:for=>"opcional"} Nombre URL:
+            %input.form-control#url{:type=>"text" ,:name=>"opcional" , :placeholder=> "(Opcional)"}
+            %button.btn.btn-success{:type=>"submit"} Entrar
+    .col-md-1
+    .col-md-7.container.jumbotron
+        %h2 Tus URLs
+        %ol
+            -@list2.each do |url|
+                %li
+                    #{url.url}
+                    -if (url.opcional == '')
+                        %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.id.to_s(Base)})
+                    -else
+                        %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.opcional})
+        %h2 Otras URLs
+        %ol
+            -@list.each do |url|
+                %li
+                    #{url.url}
+                    -if (url.opcional == '')
+                        %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.id.to_s(Base)})
+                    -else
+                        %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.opcional})
+        %form{:name=> "input" , :action=>"/",:method=>"get"}
+            %button.btn.btn-info{:type =>"submit"} Sign In With Google+
+        %form{:name=> "input" , :action=>"/user/twitter/logout",:method=>"get"}
+            %button.btn.btn-warning{:type =>"submit"} Logout
+    .col-md-1
