@@ -5,6 +5,7 @@ gem 'thin'
 gem 'data_mapper'
 gem 'sinatra-contrib'
 gem 'haml'
+gem 'omniauth-twitter'
 gem 'omniauth'
 gem 'omniauth-google-oauth2'
 gem "rake"

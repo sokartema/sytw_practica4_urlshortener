@@ -88,8 +88,7 @@ get '/auth/:name/callback' do
   when 'twitter'
 	  @auth = request.env['omniauth.auth']
 	  session[:name] = @auth['info'].name
-	  session[:nickname] = @auth['info'].nickname
-		
+	  session[:nickname] = @auth['info'].nickname	
       redirect "/user/twitter"	  	
   else
   redirect "/"
