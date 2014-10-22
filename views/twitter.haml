@@ -32,8 +32,8 @@
                         %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.id.to_s(Base)})
                     -else
                         %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.opcional})
-        %form{:name=> "input" , :action=>"/",:method=>"get"}
-            %button.btn.btn-info{:type =>"submit"} Sign In With Google+
+        %form{:name=> "input" , :action=>"/auth/google_oauth2",:method=>"get"}
+            %button.btn.btn-danger{:type =>"submit"} Sign In With Google+
         %form{:name=> "input" , :action=>"/user/twitter/logout",:method=>"get"}
             %button.btn.btn-warning{:type =>"submit"} Logout
     .col-md-1

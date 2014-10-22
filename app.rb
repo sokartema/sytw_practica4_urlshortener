@@ -47,7 +47,7 @@ set :session_secret, '*&(^#234a)'
 get '/' do
   @user = nil
   puts "inside get '/': #{params}"
-  @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil ,:limit => 20)
+  @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil , :nickname => nil ,:limit => 20)
   # in SQL => SELECT * FROM "ShortenedUrl" ORDER BY "id" ASC
   haml :index
 end
@@ -88,8 +88,8 @@ get '/auth/:name/callback' do
   when 'twitter'
 	  @auth = request.env['omniauth.auth']
 	  session[:name] = @auth['info'].name
-	  session[:nickname] = @auth['info'].nickname	
-      redirect "/user/twitter"	  	
+	  session[:nickname] = @auth['info'].nickname
+      redirect "/user/twitter"
   else
   redirect "/"
   end
@@ -107,7 +107,7 @@ get '/user/:webname' do
 	  @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil, :limit => 20)
 	  @list2 = ShortenedUrl.all(:order => [:id.asc], :email => email , :email.not => nil, :limit => 20)
 	  haml :google
-  
+
   when "twitter"
 		@user = session[:name]
 	  	nickname = session[:nickname]
@@ -129,26 +129,43 @@ end
 
 post  '/user/:webname' do
 
-  if (session[:name] != nil)
-
   uri = URI::parse(params[:url])
   if uri.is_a? URI::HTTP or uri.is_a? URI::HTTPS then
+
+  case(params[:webname])
+  when "google"
+
     begin
-      @short_url = ShortenedUrl.first_or_create(:url => params[:url] , :email => flash[:email] , :opcional => params[:opcional])
+      @short_url = ShortenedUrl.first_or_create(:url => params[:url] , :email => session[:email] , :opcional => params[:opcional])
     rescue Exception => e
       puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
       pp @short_url
       puts e.message
     end
-  else
-    logger.info "Error! <#{params[:url]}> is not a valid URL"
-  end
+
   redirect '/user/google'
+
+  when "twitter"
+
+    begin
+      @short_url = ShortenedUrl.first_or_create(:url => params[:url] , :nickname => session[:nickname] , :opcional => params[:opcional])
+    rescue Exception => e
+      puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
+      pp @short_url
+      puts e.message
+    end
+
+    redirect '/user/twitter'
 
   else
 
   redirect '/'
   end
+
+  else
+    logger.info "Error! <#{params[:url]}> is not a valid URL"
+  end
+
 end
 
 get '/user/:webname/logout' do
