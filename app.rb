@@ -5,6 +5,7 @@ require 'sinatra/reloader' if development?
 require 'haml'
 require 'uri'
 require 'pp'
+require 'omniauth-twitter'
 #require 'socket'
 require 'data_mapper'
 require 'omniauth-oauth2'
@@ -18,7 +19,14 @@ use OmniAuth::Builder do
         :force_login => 'true'
       }
     }
+	provider :twitter, config['tidentifier'], config['tsecret'],
+  {
+     :authorize_params => {
+        :force_login => 'true'
+      }
+    }
 end
+
 
 DataMapper.setup( :default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/my_shortened_urls.db" )
 DataMapper::Logger.new($stdout, :debug)
@@ -73,10 +81,16 @@ get '/auth/:name/callback' do
   config = YAML.load_file 'config/config.yml'
   case params[:name]
   when 'google_oauth2'
-  @auth = request.env['omniauth.auth']
-  session[:name] = @auth['info'].name
-  session[:email] = @auth['info'].email
-  redirect "/user/google"
+	  @auth = request.env['omniauth.auth']
+	  session[:name] = @auth['info'].name
+	  session[:email] = @auth['info'].email
+	  redirect "/user/google"
+  when 'twitter'
+	  @auth = request.env['omniauth.auth']
+	  session[:name] = @auth['info'].name
+	  session[:nickname] = @auth['info'].nickname
+		
+      redirect "/user/twitter"	  	
   else
   redirect "/"
   end
@@ -89,13 +103,16 @@ get '/user/:webname' do
 
   case(params[:webname])
   when "google"
-  @user = session[:name]
-  email = session[:email]
-  @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil, :limit => 20)
-  @list2 = ShortenedUrl.all(:order => [:id.asc], :email => email , :email.not => nil, :limit => 20)
-  haml :google
+	  @user = session[:name]
+	  email = session[:email]
+	  @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil, :limit => 20)
+	  @list2 = ShortenedUrl.all(:order => [:id.asc], :email => email , :email.not => nil, :limit => 20)
+	  haml :google
+  when "twitter"
+
+		haml :twitter
   else
-  haml :index
+  	haml :index
   end
 
   else
