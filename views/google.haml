@@ -32,7 +32,7 @@
                         %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.id.to_s(Base)})
                     -else
                         %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.opcional})
-        %form{:name=> "input" , :action=>"/",:method=>"get"}
+        %form{:name=> "input" , :action=>"/auth/twitter",:method=>"post"}
             %button.btn.btn-info{:type =>"submit"} Sign In With Twitter
         %form{:name=> "input" , :action=>"/user/google/logout",:method=>"get"}
             %button.btn.btn-warning{:type =>"submit"} Logout
