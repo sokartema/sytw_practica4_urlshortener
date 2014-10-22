@@ -107,7 +107,12 @@ get '/user/:webname' do
 	  @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil, :limit => 20)
 	  @list2 = ShortenedUrl.all(:order => [:id.asc], :email => email , :email.not => nil, :limit => 20)
 	  haml :google
+  
   when "twitter"
+		@user = session[:name]
+	  	nickname = session[:nickname]
+	  	@list = ShortenedUrl.all(:order => [ :id.asc ], :email=>nil, :nickname => nil, :limit => 20)
+	  	@list2 = ShortenedUrl.all(:order => [:id.asc], :nickname => nickname , :email=>nil, :nickname.not => nil, :limit => 20)
 
 		haml :twitter
   else
