@@ -5,6 +5,8 @@ require_relative '../app.rb'
 require 'test/unit'
 require 'minitest/autorun'
 require 'rack/test'
+require 'selenium-webdriver'
+
 
 include Rack::Test::Methods
 
@@ -68,7 +70,8 @@ describe "Test de la paginas paginas de login" do
 	before :all do
 		@pagina='/usr/google'
 		@pagina2='/usr/twitter'
-		@pagina3='/usr/facebook'		
+		@pagina3='/usr/facebook'
+
 	end
 
 
@@ -94,7 +97,6 @@ describe "Test de la paginas paginas de login" do
 		respuesta=last_response.ok?
 		assert(not(respuesta))
 		
-	end
-	
+	end	
 end
 

@@ -5,6 +5,11 @@ task :test do
   sh "ruby test/test.rb"
 end
 
+desc "run selenium login test"
+task :selenium do
+  sh "ruby test/test_s.rb"
+end
+
 desc "run the http server"
 task :init do
   sh "ruby app.rb"

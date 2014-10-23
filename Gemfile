@@ -13,6 +13,7 @@ gem "rake"
 gem "minitest"
 gem "test-unit"
 gem "rack-test"
+gem "selenium-webdriver"
 
 
 group :development do
