@@ -15,6 +15,11 @@ gem "test-unit"
 gem "rack-test"
 gem "selenium-webdriver"
 
+group :production do
+
+  gem "pg"
+  gem "dm-postgres-adapter"
+end  
 
 group :development do
 
