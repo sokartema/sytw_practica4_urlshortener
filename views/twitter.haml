@@ -2,6 +2,8 @@
     .col-md-5.container
 
         %h1 Bienvenido #{@user}
+        -if(@error)
+            %h4.text-danger Ya hay un opcional con el mismo nombre
 
 .row
     .col-md-4.container.jumbotron
@@ -32,10 +34,7 @@
             -@list.each do |url|
                 %li
                     #{url.url}
-                    -if (url.opcional == '')
-                        %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.id.to_s(Base)})
-                    -else
-                        %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.opcional})
+                    %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.id.to_s(Base)})
         %form{:name=> "input" , :action=>"/auth/google_oauth2",:method=>"get"}
             %button.btn.btn-danger{:type =>"submit"} Sign In With Google+
         %form{:name=> "input" , :action=>"/auth/facebook",:method=>"post"}

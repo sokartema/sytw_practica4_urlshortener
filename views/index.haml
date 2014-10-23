@@ -10,9 +10,15 @@
         %form{:name => "input" , :action=>"/" , :method=>"post"}
             %label{:for=>"url"} URL:
             %input.form-control#url{:type=>"text", :name=>"url" ,:placeholder=>"http://ejemplo.com"}
-            %label{:for=>"opcional"} Nombre URL:
-            %input.form-control#url{:type=>"text" ,:name=>"opcional" , :placeholder=> "(Opcional)"}
             %button.btn.btn-success{:type=>"submit"} Entrar
+            -if(session[:url] != nil)
+                %ul
+                    -@list2.each do |url|
+                        %li
+                            #{url.url}
+                            %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.id.to_s(Base)})
+
+
     .col-md-1
     .col-md-7.container.jumbotron
         %h2 URLs
@@ -20,10 +26,7 @@
             -@list.each do |url|
                 %li
                     #{url.url}
-                    -if (url.opcional == '')
-                        %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.id.to_s(Base)})
-                    -else
-                        %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.opcional})
+                    %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.id.to_s(Base)})
         %form{:name=> "input" , :action => "/auth/google_oauth2" , :method=>"post"}
             %button.btn.btn-danger{:type => "submit"} Sign In With Google+
         %form{:name=> "input" , :action=>"/auth/twitter",:method=>"post"}

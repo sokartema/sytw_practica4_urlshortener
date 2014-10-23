@@ -54,6 +54,7 @@ get '/' do
   @webname = nil
   puts "inside get '/': #{params}"
   @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil , :nickname => nil).shuffle.slice(0..2)
+  @list2 = ShortenedUrl.all(:order => [ :id.asc ], :email => nil , :nickname => nil, :url => session[:url])
 
   haml :index
 end
@@ -61,10 +62,10 @@ end
 post '/' do
   puts "inside post '/': #{params}"
   uri = URI::parse(params[:url])
-  opcional = params[:opcional]
   if uri.is_a? URI::HTTP or uri.is_a? URI::HTTPS then
     begin
-      @short_url = ShortenedUrl.first_or_create(:url => params[:url] , :opcional => params[:opcional])
+      @short_url = ShortenedUrl.first_or_create(:url => params[:url])
+      session[:url] = params[:url]
     rescue Exception => e
       puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
       pp @short_url
@@ -117,6 +118,9 @@ end
 
 get '/user/:webname' do
 
+  @error = session[:error1]
+  session[:error1] = false
+
   if (session[:name] != nil)
 
   @webname = params[:webname]
@@ -158,53 +162,78 @@ end
 
 post  '/user/:webname' do
 
-  uri = URI::parse(params[:url])
-  if uri.is_a? URI::HTTP or uri.is_a? URI::HTTPS then
+  count = 0
 
-  case(params[:webname])
-  when "google"
+  if(params[:opcional] != '') then
 
-    begin
-      @short_url = ShortenedUrl.first_or_create(:url => params[:url] , :email => session[:email] , :opcional => params[:opcional])
-    rescue Exception => e
-      puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
-      pp @short_url
-      puts e.message
-    end
+  count = ShortenedUrl.count(:opcional.not => nil , :conditions => [ 'opcional = ?', params[:opcional] ])
 
-  redirect '/user/google'
-
-  when "twitter"
-
-    begin
-      @short_url = ShortenedUrl.first_or_create(:url => params[:url] , :nickname => session[:nickname] , :opcional => params[:opcional])
-    rescue Exception => e
-      puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
-      pp @short_url
-      puts e.message
-    end
-
-    redirect '/user/twitter'
-
-  when "facebook"
-
-      begin
-        @short_url = ShortenedUrl.first_or_create(:url => params[:url] , :email => session[:email] , :opcional => params[:opcional])
-      rescue Exception => e
-        puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
-        pp @short_url
-        puts e.message
-      end
-
-    redirect '/user/facebook'
-
-  else
-
-  redirect '/'
   end
 
+  if(count == 0) then
+
+  uri = URI::parse(params[:url])
+
+  if uri.is_a? URI::HTTP or uri.is_a? URI::HTTPS then
+
+      case(params[:webname])
+      when "google"
+
+        begin
+          @short_url = ShortenedUrl.first_or_create(:url => params[:url] , :email => session[:email] , :opcional => params[:opcional])
+        rescue Exception => e
+          puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
+          pp @short_url
+          puts e.message
+        end
+
+      redirect '/user/google'
+
+      when "twitter"
+
+        begin
+          @short_url = ShortenedUrl.first_or_create(:url => params[:url] , :nickname => session[:nickname] , :opcional => params[:opcional])
+        rescue Exception => e
+          puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
+          pp @short_url
+          puts e.message
+        end
+
+        redirect '/user/twitter'
+
+      when "facebook"
+
+          begin
+            @short_url = ShortenedUrl.first_or_create(:url => params[:url] , :email => session[:email] , :opcional => params[:opcional])
+          rescue Exception => e
+            puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
+            pp @short_url
+            puts e.message
+          end
+
+        redirect '/user/facebook'
+
+      else
+
+      redirect '/'
+      end
+
+    else
+      logger.info "Error! <#{params[:url]}> is not a valid URL"
+    end
+
   else
-    logger.info "Error! <#{params[:url]}> is not a valid URL"
+
+    session[:error1] = true
+    case(params[:webname])
+    when "google"
+      redirect '/user/google'
+    when "twitter"
+      redirect '/user/twitter'
+    when "facebook"
+      redirect '/user/facebook'
+    end
+
   end
 
 end
