@@ -346,6 +346,10 @@ small {
 cite {
   font-style: normal;
 }
+}
+.text-facebook {
+  color: #0365B8;
+}
 .text-muted {
   color: #a79ea0;
 }

@@ -6,7 +6,6 @@ require 'haml'
 require 'uri'
 require 'pp'
 require 'omniauth-twitter'
-#require 'socket'
 require 'data_mapper'
 require 'omniauth-oauth2'
 require 'omniauth-google-oauth2'
@@ -27,7 +26,7 @@ use OmniAuth::Builder do
       }
     }
   provider :facebook, config['fidentifier'], config['fsecret'],
-    :scope => 'email, public_profile'
+    :scope => 'email, public_profile', :auth_type => 'reauthenticate'
 
 end
 
@@ -43,6 +42,8 @@ DataMapper.finalize
 #DataMapper.auto_migrate!
 DataMapper.auto_upgrade!
 
+use Rack::MethodOverride
+
 Base = 36
 
 enable :sessions
@@ -52,8 +53,8 @@ get '/' do
   @user = nil
   @webname = nil
   puts "inside get '/': #{params}"
-  @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil , :nickname => nil ,:limit => 20)
-  # in SQL => SELECT * FROM "ShortenedUrl" ORDER BY "id" ASC
+  @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil , :nickname => nil).shuffle.slice(0..2)
+
   haml :index
 end
 
@@ -76,10 +77,18 @@ post '/' do
 end
 
 get '/:shortened' do
-  puts "inside get '/:shortened': #{params}"
+
   short_url = ShortenedUrl.first(:id => params[:shortened].to_i(Base))
 
   redirect short_url.url, 301
+end
+
+get '/u/:shortened' do
+
+  short_url = ShortenedUrl.first(:opcional => params[:shortened])
+
+  redirect short_url.url, 301
+
 end
 
 get '/auth/:name/callback' do
@@ -116,14 +125,14 @@ get '/user/:webname' do
   when "google"
 	  @user = session[:name]
 	  email = session[:email]
-	  @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil, :limit => 20)
+	  @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil , :nickname => nil).shuffle.slice(0..2)
 	  @list2 = ShortenedUrl.all(:order => [:id.asc], :email => email , :email.not => nil, :limit => 20)
 	  haml :google
 
   when "twitter"
 		@user = session[:name]
 	  	nickname = session[:nickname]
-	  	@list = ShortenedUrl.all(:order => [ :id.asc ], :email=>nil, :nickname => nil, :limit => 20)
+	  	@list = ShortenedUrl.all(:order => [ :id.asc ], :email=>nil, :nickname => nil).shuffle.slice(0..2)
 	  	@list2 = ShortenedUrl.all(:order => [:id.asc], :nickname => nickname , :email=>nil, :nickname.not => nil, :limit => 20)
 
 		haml :twitter
@@ -131,7 +140,7 @@ get '/user/:webname' do
 
     @user = session[:name]
     email = session[:email]
-    @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil, :limit => 20)
+    @list = ShortenedUrl.all(:order => [ :id.asc ], :email => nil, :nickname => nil).shuffle.slice(0..2)
     @list2 = ShortenedUrl.all(:order => [:id.asc], :email => email , :email.not => nil, :limit => 20)
     haml :facebook
 
@@ -205,6 +214,77 @@ get '/user/:webname/logout' do
   session.clear
 
   redirect '/'
+
+end
+
+delete '/delete/:webname/:url' do
+
+  case (params[:webname])
+    when 'google'
+      begin
+      @id = ShortenedUrl.first(:email => session[:email], :opcional => params[:url])
+      @id.destroy if !@id.nil?
+      rescue Exception => e
+        puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
+        pp @short_url
+        puts e.message
+      end
+      redirect '/user/google'
+    when 'twitter'
+      begin
+      @id = ShortenedUrl.first(:nickname => session[:nickname], :opcional => params[:url])
+      @id.destroy if !@id.nil?
+      rescue Exception => e
+        puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
+        pp @short_url
+        puts e.message
+      end
+      redirect '/user/twitter'
+    when 'facebook'
+      begin
+      @id = ShortenedUrl.first(:email => session[:email], :opcional => params[:url])
+      @id.destroy if !@id.nil?
+      rescue Exception => e
+        puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
+        pp @short_url
+        puts e.message
+      end
+      redirect '/user/facebook'
+
+    when 'googleid'
+        begin
+        @id = ShortenedUrl.first(:email => session[:email], :id => params[:url].to_i(Base))
+        @id.destroy if !@id.nil?
+        rescue Exception => e
+          puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
+          pp @short_url
+          puts e.message
+        end
+        redirect '/user/google'
+      when 'twitterid'
+        begin
+        @id = ShortenedUrl.first(:nickname => session[:nickname], :id => params[:url].to_i(Base))
+        @id.destroy if !@id.nil?
+        rescue Exception => e
+          puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
+          pp @short_url
+          puts e.message
+        end
+        redirect '/user/twitter'
+      when 'facebookid'
+        begin
+        @id = ShortenedUrl.first(:email => session[:email], :id => params[:url].to_i(Base))
+        @id.destroy if !@id.nil?
+        rescue Exception => e
+          puts "EXCEPTION!!!!!!!!!!!!!!!!!!!"
+          pp @short_url
+          puts e.message
+        end
+        redirect '/user/facebook'
+    else
+
+      redirect '/'
+  end
 
 end
 

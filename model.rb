@@ -6,4 +6,5 @@ class ShortenedUrl
   property :opcional, Text
   property :email, Text
   property :nickname, Text
+  
 end

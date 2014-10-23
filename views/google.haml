@@ -1,7 +1,7 @@
 .row
     .col-md-5.container
 
-        %h1 Bienvenido #{@user}
+        %h1.text-danger Bienvenido #{@user}
 
 .row
     .col-md-4.container.jumbotron
@@ -15,16 +15,20 @@
     .col-md-1
     .col-md-7.container.jumbotron
         %h2 Tus URLs
-        %ol
+        %ul
             -@list2.each do |url|
                 %li
                     #{url.url}
                     -if (url.opcional == '')
                         %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.id.to_s(Base)})
+                        %form{:name=> "input" , :action=>"/delete/googleid/#{url.id.to_s(Base)}",:method=>"post"}
+                            %button.btn.btn-danger{:type => "submit",:name=>"_method" , :value=>"delete"} Borrar
                     -else
                         %a{:href=>"/#{url.id.to_s(Base)}"} (#{url.opcional})
+                        %form{:name=> "input" , :action=>"/delete/google/#{url.opcional}",:method=>"post"}
+                            %button.btn.btn-danger{:type => "submit",:name=>"_method" , :value=>"delete"} Borrar
         %h2 Otras URLs
-        %ol
+        %ul
             -@list.each do |url|
                 %li
                     #{url.url}
