@@ -13,6 +13,8 @@ require 'omniauth-facebook'
 
 set :environment, :development
 
+set :protection , :except => :session_hijacking
+
 use OmniAuth::Builder do
   config = YAML.load_file 'config/config.yml'
   provider :google_oauth2, config['gidentifier'], config['gsecret'],
