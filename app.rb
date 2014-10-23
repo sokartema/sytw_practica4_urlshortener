@@ -86,7 +86,9 @@ end
 
 get '/u/:shortened' do
 
+
   short_url = ShortenedUrl.first(:opcional => params[:shortened])
+
 
   redirect short_url.url, 301
 
