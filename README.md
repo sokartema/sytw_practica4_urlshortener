@@ -4,7 +4,7 @@
 
 Aplicacion para la creacion de links acortados de paginas webs y su almacenamiento. El logueo se podra realizar mediante la autentificacion de Facebook, Google o Twitter, ademas de permitir el uso anonimo de la misma.
 
-El usuario logueado almacenara sus links, y ademas tendra la posibilidad de añadir el nombre de la url, ademas de borrarlos de su lista si lo cree necesario.
+El usuario logueado almacenara sus links, y ademas tendra la posibilidad de añadir el nombre de la url, ademas de borrarlos de su lista si lo cree necesario. Para ir a un link en concreto, seleccione en la lista o ponte /u/ y el codigo del link en la barra de navegacion.
 
 Este proyecto ha sido implementado para el despliegue en heroku y contiene tests con seguimiento en travis.
 
