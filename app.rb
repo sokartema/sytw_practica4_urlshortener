@@ -11,7 +11,7 @@ require 'omniauth-oauth2'
 require 'omniauth-google-oauth2'
 require 'omniauth-facebook'
 
-set :environment, :development
+set :environment, :production
 
 use OmniAuth::Builder do
   config = YAML.load_file 'config/config.yml'
