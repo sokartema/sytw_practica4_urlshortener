@@ -26,11 +26,16 @@ Antes de iniciar el servidor ejecutar `bundle install` o `rake bundle`
 Si hay problemas al hacer bundle install, debemos hacer lo siguiente:
 
   En MAC:
+  
       Abrir una terminal y si tenemos instalado hombrew ejecutar `brew install postgresql`
+
   En Linux:
       Ejecutar: `sudo apt-get install postgresql`
+
       Si sigue sin funcionar instalar lo siguiente:
+
       `sudo apt-get install -qq postgresql-server-dev-9.3`
+
       `sudo apt-get install -qq libpq-dev`
 
 Para arrancar el servidor situese en el directorio y ejecute `rackup`,`rake init` o `rake rackup` luego abra un navegador y vaya a la direccion localhost:9292
