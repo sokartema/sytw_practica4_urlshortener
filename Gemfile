@@ -17,9 +17,10 @@ gem "selenium-webdriver"
 
 group :production do
 
+  gem "do_postgres"
   gem "pg"
   gem "dm-postgres-adapter"
-end  
+end
 
 group :development do
 
